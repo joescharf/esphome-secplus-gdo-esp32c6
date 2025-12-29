@@ -1,0 +1,16 @@
+{
+    "name": "gdolib-c6",
+    "version": "1.0.0",
+    "description": "Garage door opener library for ESP32-C6 (RISC-V)",
+    "keywords": ["garage", "door", "security+", "esp32-c6", "ratgdo"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/konnected-io/gdolib"
+    },
+    "build": {
+        "flags": ["-I include"],
+        "extraScript": "pre:extra_script.py"
+    },
+    "frameworks": "espidf",
+    "platforms": "espressif32"
+}

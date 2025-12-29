@@ -1,0 +1,13 @@
+# ESP-IDF component wrapper for gdolib
+# Sources are symlinked from upstream/gdolib during build
+
+idf_component_register(SRCS
+                        "gdo.c"
+                        "gdo_utils.c"
+                        "secplus.c"
+                    INCLUDE_DIRS
+                        "include"
+                    REQUIRES
+                        driver
+                        esp_timer
+)

@@ -1,0 +1,13 @@
+# User configuration (contains device-specific settings)
+config.env
+
+# ESP-IDF build artifacts
+esp-idf-build/build/
+esp-idf-build/sdkconfig
+
+# Copied library in ESPHome component (copied from lib/ during build)
+esphome/components/gdolib-c6/libgdolib.a
+esphome/components/gdolib-c6/include/
+
+# Claude Code workspace
+.claude/

@@ -1,0 +1,1 @@
+/home/js/app/esphome-secplus-gdo-esp32c6/upstream/gdolib/gdo_priv.h
