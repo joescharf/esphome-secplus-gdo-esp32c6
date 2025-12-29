@@ -1,0 +1,6 @@
+[submodule "upstream/gdolib"]
+	path = upstream/gdolib
+	url = https://github.com/konnected-io/gdolib.git
+[submodule "upstream/esphome-secplus-gdo"]
+	path = upstream/esphome-secplus-gdo
+	url = https://github.com/joescharf/esphome-secplus-gdo.git
