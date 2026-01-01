@@ -1,0 +1,4 @@
+# gdolib version tracking
+# This file records the gdolib commit used to build libgdolib.a
+# If upstream/gdolib is at a different commit, rebuild with: ./build.sh --rebuild-lib
+GDOLIB_COMMIT=bb84f61fd3b232b8a398d6432401ef3c00511cb7

@@ -94,12 +94,12 @@ On most Security+ compatible openers (LiftMaster, Chamberlain, Craftsman):
 
 ### GPIO Pins (config.env)
 
-| Variable | Default | Description |
+| Variable | Example | Description |
 |----------|---------|-------------|
 | `GDO_TX_PIN` | 16 | UART TX pin (to garage door opener) |
 | `GDO_RX_PIN` | 17 | UART RX pin (from garage door opener) |
-| `STATUS_LED_PIN` | 23 | Status LED (optional, comment out to disable) |
-| `OBSTRUCTION_PIN` | - | Obstruction sensor (optional, uses protocol detection if not set) |
+| `STATUS_LED_PIN` | 23 | Status LED pin (optional, comment out to disable) |
+| `OBSTRUCTION_PIN` | - | Obstruction sensor pin (optional, uses protocol detection if not set) |
 | `DEVICE_NAME` | garage-door | ESPHome device name |
 | `FRIENDLY_NAME` | Garage Door | Display name in Home Assistant |
 
@@ -122,6 +122,8 @@ On most Security+ compatible openers (LiftMaster, Chamberlain, Craftsman):
 ./build.sh --upload                     # Compile and flash to device
 ./build.sh --upload --device <IP>       # Flash to specific IP (bypasses mDNS)
 ./build.sh --upload --logs              # Compile, flash, and show logs
+./build.sh --logs                       # Show device logs (standalone)
+./build.sh --logs --device <IP>         # Show logs from specific IP
 ./build.sh --clean                      # Remove ESPHome build artifacts
 ./build.sh --clean-all                  # Remove all build artifacts
 ./build.sh --clean --compile            # Clean then rebuild

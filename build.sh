@@ -179,6 +179,19 @@ if [[ "$SKIP_SUBMODULES" != "true" ]]; then
     info "Submodules updated."
 fi
 
+# Check library version against upstream gdolib
+VERSION_FILE="${SCRIPT_DIR}/lib/esp32c6/VERSION"
+if [[ -f "$VERSION_FILE" && -d "${SCRIPT_DIR}/upstream/gdolib/.git" ]]; then
+    BUILT_COMMIT=$(grep "^GDOLIB_COMMIT=" "$VERSION_FILE" | cut -d= -f2)
+    CURRENT_COMMIT=$(git -C "${SCRIPT_DIR}/upstream/gdolib" rev-parse HEAD)
+    if [[ -n "$BUILT_COMMIT" && "$BUILT_COMMIT" != "$CURRENT_COMMIT" ]]; then
+        warn "Library version mismatch detected!"
+        echo "  Built with:  ${BUILT_COMMIT:0:7}"
+        echo "  Upstream is: ${CURRENT_COMMIT:0:7}"
+        echo "  Consider running: ./build.sh --rebuild-lib"
+    fi
+fi
+
 # Step 2: Rebuild library if requested
 if [[ "$REBUILD_LIB" == "true" ]]; then
     step "Rebuilding libgdolib.a for ESP32-C6..."
@@ -259,6 +272,16 @@ Or reinstall using ESP-IDF Installation Manager:
     cp "${BUILD_DIR}/build/esp-idf/gdolib/libgdolib.a" "${SCRIPT_DIR}/lib/esp32c6/"
     cp "${UPSTREAM_GDOLIB}/include/gdo.h" "${SCRIPT_DIR}/lib/esp32c6/include/"
 
+    # Update VERSION file with current gdolib commit
+    CURRENT_COMMIT=$(git -C "${UPSTREAM_GDOLIB}" rev-parse HEAD)
+    cat > "${SCRIPT_DIR}/lib/esp32c6/VERSION" <<EOF
+# gdolib version tracking
+# This file records the gdolib commit used to build libgdolib.a
+# If upstream/gdolib is at a different commit, rebuild with: ./build.sh --rebuild-lib
+GDOLIB_COMMIT=${CURRENT_COMMIT}
+EOF
+    info "Updated VERSION file with commit ${CURRENT_COMMIT:0:7}"
+
     info "Library rebuilt successfully!"
     cd "$SCRIPT_DIR"
 fi
@@ -296,8 +319,7 @@ fi
 # Generate from template
 # Use sed for substitution (more portable than envsubst)
 # For multi-line replacements, use escaped newlines
-sed -e "s|\${SCRIPT_DIR}|${SCRIPT_DIR}|g" \
-    -e "s|\${GDO_TX_PIN}|${GDO_TX_PIN}|g" \
+sed -e "s|\${GDO_TX_PIN}|${GDO_TX_PIN}|g" \
     -e "s|\${GDO_RX_PIN}|${GDO_RX_PIN}|g" \
     -e "s|\${DEVICE_NAME}|${DEVICE_NAME}|g" \
     -e "s|\${FRIENDLY_NAME}|${FRIENDLY_NAME}|g" \
@@ -319,8 +341,20 @@ if [[ ! -f "$SECRETS_FILE" ]]; then
     exit 0
 fi
 
-# Step 6: Compile/Upload ESPHome firmware
-if [[ "$COMPILE_ONLY" == "true" || "$UPLOAD" == "true" ]]; then
+# Validate secrets.yaml has required keys
+SECRETS_VALID=true
+for key in wifi_ssid wifi_password api_encryption_key ota_password; do
+    if ! grep -q "^${key}:" "$SECRETS_FILE"; then
+        warn "Missing required key '$key' in secrets.yaml"
+        SECRETS_VALID=false
+    fi
+done
+if [[ "$SECRETS_VALID" != "true" ]]; then
+    warn "Please update $SECRETS_FILE with all required keys before building."
+fi
+
+# Step 6: Compile/Upload/Logs ESPHome firmware
+if [[ "$COMPILE_ONLY" == "true" || "$UPLOAD" == "true" || "$LOGS" == "true" ]]; then
     # Determine ESPHome command
     if command -v uv &> /dev/null; then
         # Use Python 3.13 (ESP-IDF requires Python 3.10-3.13, not 3.14+)
@@ -341,12 +375,12 @@ if [[ "$COMPILE_ONLY" == "true" || "$UPLOAD" == "true" ]]; then
         else
             $ESPHOME_CMD run esp32c6-gdo.yaml
         fi
-    else
+        info "Build complete!"
+    elif [[ "$COMPILE_ONLY" == "true" ]]; then
         step "Compiling ESPHome firmware..."
         $ESPHOME_CMD compile esp32c6-gdo.yaml
+        info "Build complete!"
     fi
-
-    info "Build complete!"
 
     if [[ "$LOGS" == "true" ]]; then
         step "Showing device logs..."

@@ -15,8 +15,8 @@ esphome:
   friendly_name: ${friendly_name}
   platformio_options:
     build_flags:
-      - -I${SCRIPT_DIR}/esphome/components/gdolib-c6/include
-      - -L${SCRIPT_DIR}/esphome/components/gdolib-c6
+      - -Icomponents/gdolib-c6/include
+      - -Lcomponents/gdolib-c6
       - -lgdolib
 
 esp32:
@@ -58,7 +58,7 @@ ota:
 external_components:
   - source:
       type: local
-      path: ${SCRIPT_DIR}/upstream/esphome-secplus-gdo/components
+      path: ../upstream/esphome-secplus-gdo/components
     components: [secplus_gdo]
 
 # GDO Configuration
