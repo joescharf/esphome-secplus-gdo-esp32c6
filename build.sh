@@ -35,6 +35,7 @@ UPLOAD=false
 LOGS=false
 CLEAN=false
 CLEAN_ALL=false
+DEVICE_IP=""
 
 print_usage() {
     echo "ESP32-C6 Security+ Garage Door Opener Build Script"
@@ -46,6 +47,7 @@ print_usage() {
     echo "  --skip-submodules Skip git submodule update"
     echo "  --compile         Compile ESPHome firmware"
     echo "  --upload          Compile and upload firmware to device"
+    echo "  --device <IP>     Device IP address for OTA upload (bypasses mDNS)"
     echo "  --logs            Show device logs after upload"
     echo "  --clean           Remove ESPHome build artifacts (.esphome/)"
     echo "  --clean-all       Remove all build artifacts (ESPHome + ESP-IDF + generated files)"
@@ -68,7 +70,8 @@ print_usage() {
     echo ""
     echo "Examples:"
     echo "  ./build.sh --compile              # Build firmware"
-    echo "  ./build.sh --upload               # Build and flash"
+    echo "  ./build.sh --upload               # Build and flash via mDNS"
+    echo "  ./build.sh --upload --device 192.168.1.100  # Flash to specific IP"
     echo "  ./build.sh --upload --logs        # Build, flash, and show logs"
     echo "  ./build.sh --rebuild-lib --compile  # Rebuild library and compile"
     echo "  ./build.sh --clean                # Clean ESPHome build cache"
@@ -97,6 +100,10 @@ while [[ $# -gt 0 ]]; do
         --logs)
             LOGS=true
             shift
+            ;;
+        --device)
+            DEVICE_IP="$2"
+            shift 2
             ;;
         --clean)
             CLEAN=true
@@ -327,7 +334,12 @@ if [[ "$COMPILE_ONLY" == "true" || "$UPLOAD" == "true" ]]; then
 
     if [[ "$UPLOAD" == "true" ]]; then
         step "Compiling and uploading ESPHome firmware..."
-        $ESPHOME_CMD run esp32c6-gdo.yaml
+        if [[ -n "$DEVICE_IP" ]]; then
+            info "Using device IP: $DEVICE_IP"
+            $ESPHOME_CMD run esp32c6-gdo.yaml --device "$DEVICE_IP"
+        else
+            $ESPHOME_CMD run esp32c6-gdo.yaml
+        fi
     else
         step "Compiling ESPHome firmware..."
         $ESPHOME_CMD compile esp32c6-gdo.yaml
@@ -337,7 +349,11 @@ if [[ "$COMPILE_ONLY" == "true" || "$UPLOAD" == "true" ]]; then
 
     if [[ "$LOGS" == "true" ]]; then
         step "Showing device logs..."
-        $ESPHOME_CMD logs esp32c6-gdo.yaml
+        if [[ -n "$DEVICE_IP" ]]; then
+            $ESPHOME_CMD logs esp32c6-gdo.yaml --device "$DEVICE_IP"
+        else
+            $ESPHOME_CMD logs esp32c6-gdo.yaml
+        fi
     fi
 else
     info "Setup complete!"
