@@ -20,7 +20,7 @@ This repository provides:
 
 ### Prerequisites
 
-- Python 3.9+ with `pip` or `uv`
+- Python 3.10-3.13 with `pip` or `uv` (Python 3.14+ not supported by ESP-IDF)
 - ESPHome installed (`pip install esphome` or `uv tool install esphome`)
 - Git
 - USB cable (data-capable, not power-only)
@@ -117,12 +117,16 @@ On most Security+ compatible openers (LiftMaster, Chamberlain, Craftsman):
 ## Build Script Options
 
 ```bash
-./build.sh --help           # Show help
-./build.sh --compile        # Compile firmware only
-./build.sh --upload         # Compile and flash to device
-./build.sh --upload --logs  # Compile, flash, and show logs
-./build.sh --rebuild-lib    # Rebuild gdolib from source (requires ESP-IDF)
-./build.sh --skip-submodules # Skip git submodule update
+./build.sh --help                       # Show help
+./build.sh --compile                    # Compile firmware only
+./build.sh --upload                     # Compile and flash to device
+./build.sh --upload --device <IP>       # Flash to specific IP (bypasses mDNS)
+./build.sh --upload --logs              # Compile, flash, and show logs
+./build.sh --clean                      # Remove ESPHome build artifacts
+./build.sh --clean-all                  # Remove all build artifacts
+./build.sh --clean --compile            # Clean then rebuild
+./build.sh --rebuild-lib                # Rebuild gdolib from source (requires ESP-IDF)
+./build.sh --skip-submodules            # Skip git submodule update
 ```
 
 ## First Boot and Initial Setup
@@ -232,17 +236,23 @@ The device runs a web server for local access and debugging:
 
 If you need to rebuild the gdolib library from source (e.g., after upstream updates):
 
-1. **Install ESP-IDF v5.x using the Installation Manager (Recommended):**
+1. **Install ESP-IDF v5.5.2 using the Installation Manager (Recommended):**
 
-   Download and run the [ESP-IDF Installation Manager](https://docs.espressif.com/projects/idf-im-ui/en/latest/general_info.html):
-   - Select ESP-IDF v5.x
-   - Select ESP32-C6 as the target chip
-   - Follow the installation wizard
+   Install using [ESP-IDF Installation Manager](https://dl.espressif.com/dl/eim/):
+   ```bash
+   # Linux (Debian/Ubuntu)
+   sudo apt install eim && eim install --idf-versions v5.5.2
+
+   # macOS
+   brew tap espressif/eim && brew install --cask eim-gui
+
+   # Windows
+   winget install Espressif.EIM
+   ```
 
    After installation, activate ESP-IDF:
    ```bash
-   # The exact path depends on your installation
-   source ~/esp/esp-idf/export.sh
+   source ~/.espressif/v5.5.2/esp-idf/export.sh
    ```
 
 2. **Rebuild:**
