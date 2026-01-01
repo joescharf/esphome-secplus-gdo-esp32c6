@@ -323,7 +323,8 @@ fi
 if [[ "$COMPILE_ONLY" == "true" || "$UPLOAD" == "true" ]]; then
     # Determine ESPHome command
     if command -v uv &> /dev/null; then
-        ESPHOME_CMD="uv tool run esphome"
+        # Use Python 3.13 (ESP-IDF requires Python 3.10-3.13, not 3.14+)
+        ESPHOME_CMD="uv tool run --python 3.13 esphome"
     elif command -v esphome &> /dev/null; then
         ESPHOME_CMD="esphome"
     else
