@@ -206,7 +206,7 @@ if [[ "$REBUILD_LIB" == "true" ]]; then
             "$HOME/.espressif/v5.5.2/esp-idf" \
             "$HOME/.espressif/v5.4/esp-idf" \
             "$HOME/.espressif/v5.3/esp-idf"; do
-            if [[ -d "$idf_candidate" ]]; then
+            if [[ -f "$idf_candidate/export.sh" ]]; then
                 IDF_PATH="$idf_candidate"
                 break
             fi
@@ -240,9 +240,6 @@ Or reinstall using ESP-IDF Installation Manager:
   eim install --idf-versions v5.5.2"
     fi
 
-    # Source ESP-IDF environment
-    source "$IDF_PATH/export.sh"
-
     # Create symlinks for gdolib source
     BUILD_DIR="${SCRIPT_DIR}/esp-idf-build"
     GDOLIB_COMPONENT="${BUILD_DIR}/components/gdolib"
@@ -261,11 +258,22 @@ Or reinstall using ESP-IDF Installation Manager:
     ln -sf "${UPSTREAM_GDOLIB}/gdo_priv.h" "${GDOLIB_COMPONENT}/"
     ln -sf "${UPSTREAM_GDOLIB}/include" "${GDOLIB_COMPONENT}/"
 
-    # Build
+    # Build gdolib
     info "Building gdolib for ESP32-C6 (RISC-V)..."
     cd "$BUILD_DIR"
-    idf.py set-target esp32c6
-    idf.py build
+
+    # Check if ESP-IDF environment is activated (IDF_PYTHON_ENV_PATH is set by activate script)
+    if [[ -z "$IDF_PYTHON_ENV_PATH" ]]; then
+        error "ESP-IDF environment not activated. Please activate it first:
+
+  source ~/.espressif/tools/activate_idf_v5.5.2.sh
+
+Then run this command again."
+    fi
+
+    info "Using activated ESP-IDF environment"
+    python "$IDF_PATH/tools/idf.py" set-target esp32c6
+    python "$IDF_PATH/tools/idf.py" build
 
     # Copy built library
     info "Copying built library..."

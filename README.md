@@ -238,29 +238,33 @@ The device runs a web server for local access and debugging:
 
 If you need to rebuild the gdolib library from source (e.g., after upstream updates):
 
-1. **Install ESP-IDF v5.5.2 using the Installation Manager (Recommended):**
+### Prerequisites for Rebuilding
 
-   Install using [ESP-IDF Installation Manager](https://dl.espressif.com/dl/eim/):
+**ESP-IDF v5.5.2** - Install using [ESP-IDF Installation Manager](https://dl.espressif.com/dl/eim/):
+```bash
+# Linux (Debian/Ubuntu)
+sudo apt install eim && eim install --idf-versions v5.5.2
+
+# macOS
+brew tap espressif/eim && brew install --cask eim-gui
+
+# Windows
+winget install Espressif.EIM
+```
+
+### Rebuild
+
+1. **Activate ESP-IDF environment** (required before rebuilding):
    ```bash
-   # Linux (Debian/Ubuntu)
-   sudo apt install eim && eim install --idf-versions v5.5.2
-
-   # macOS
-   brew tap espressif/eim && brew install --cask eim-gui
-
-   # Windows
-   winget install Espressif.EIM
+   source ~/.espressif/tools/activate_idf_v5.5.2.sh
    ```
 
-   After installation, activate ESP-IDF:
-   ```bash
-   source ~/.espressif/v5.5.2/esp-idf/export.sh
-   ```
-
-2. **Rebuild:**
+2. **Run the rebuild**:
    ```bash
    ./build.sh --rebuild-lib --compile
    ```
+
+**Note:** ESP-IDF v5.x requires Python 3.10-3.13 (not 3.14+). The activation script sets up the correct Python environment.
 
 ## Running Tests
 
