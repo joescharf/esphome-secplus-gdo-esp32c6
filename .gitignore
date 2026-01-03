@@ -5,6 +5,14 @@ config.env
 esp-idf-build/build/
 esp-idf-build/sdkconfig
 
+# ESP-IDF component symlinks (recreated during build)
+esp-idf-build/components/gdolib/gdo.c
+esp-idf-build/components/gdolib/gdo_utils.c
+esp-idf-build/components/gdolib/secplus.c
+esp-idf-build/components/gdolib/secplus.h
+esp-idf-build/components/gdolib/gdo_priv.h
+esp-idf-build/components/gdolib/include
+
 # Copied library in ESPHome component (copied from lib/ during build)
 esphome/components/gdolib-c6/libgdolib.a
 esphome/components/gdolib-c6/include/
